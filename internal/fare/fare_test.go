@@ -23,7 +23,7 @@ func (suite *TestSuite) TestCalculate() {
 		{
 			name: "CalculateIdleAndLessThanMinimum",
 			objs: []model.Segment{
-				model.Segment{
+				{
 					Position1: model.Position{
 						Coordinate: model.Coordinate{
 							Latitude:  37.966660,
@@ -48,7 +48,7 @@ func (suite *TestSuite) TestCalculate() {
 		{
 			name: "CalculateMovingNormalFare",
 			objs: []model.Segment{
-				model.Segment{
+				{
 					Position1: model.Position{
 						Timestamp: time.Unix(1405594957, 0),
 					},
@@ -58,7 +58,7 @@ func (suite *TestSuite) TestCalculate() {
 					Distance: 3.8,
 					Speed:    80,
 				},
-				model.Segment{
+				{
 					Position1: model.Position{
 						Timestamp: time.Unix(1405594957, 0),
 					},
@@ -74,7 +74,7 @@ func (suite *TestSuite) TestCalculate() {
 		{
 			name: "CalculateMovingExtraFare",
 			objs: []model.Segment{
-				model.Segment{
+				{
 					Position1: model.Position{
 						Timestamp: time.Unix(1604794500, 0),
 					},
@@ -84,7 +84,7 @@ func (suite *TestSuite) TestCalculate() {
 					Distance: 3.8,
 					Speed:    80,
 				},
-				model.Segment{
+				{
 					Position1: model.Position{
 						Timestamp: time.Unix(1604794500, 0),
 					},
@@ -100,7 +100,7 @@ func (suite *TestSuite) TestCalculate() {
 		{
 			name: "CalculateMovingNormalAndExtraFare",
 			objs: []model.Segment{
-				model.Segment{
+				{
 					Position1: model.Position{
 						Timestamp: time.Unix(1405594957, 0),
 					},
@@ -110,7 +110,7 @@ func (suite *TestSuite) TestCalculate() {
 					Distance: 3.8,
 					Speed:    80,
 				},
-				model.Segment{
+				{
 					Position1: model.Position{
 						Timestamp: time.Unix(1604794500, 0),
 					},

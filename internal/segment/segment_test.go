@@ -23,14 +23,14 @@ func (suite *TestSuite) TestCreate() {
 		{
 			name: "CreateOneValidSegment",
 			objs: []model.Position{
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.966660,
 						Longitude: 23.728308,
 					},
 					Timestamp: time.Unix(1405594957, 0),
 				},
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.966627,
 						Longitude: 23.728263,
@@ -43,28 +43,28 @@ func (suite *TestSuite) TestCreate() {
 		{
 			name: "CreateTwoValidSegmentsWithOneInvalidPosition",
 			objs: []model.Position{
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.966660,
 						Longitude: 23.728308,
 					},
 					Timestamp: time.Unix(1405594957, 0),
 				},
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.966627,
 						Longitude: 23.728263,
 					},
 					Timestamp: time.Unix(1405594966, 0),
 				},
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.967627,
 						Longitude: 30.729563,
 					},
 					Timestamp: time.Unix(1405594976, 0),
 				},
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.966647,
 						Longitude: 23.728763,
@@ -77,21 +77,21 @@ func (suite *TestSuite) TestCreate() {
 		{
 			name: "CreateOneValidSegmentWithLastInvalidPosition",
 			objs: []model.Position{
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.966660,
 						Longitude: 23.728308,
 					},
 					Timestamp: time.Unix(1405594957, 0),
 				},
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.966627,
 						Longitude: 23.728263,
 					},
 					Timestamp: time.Unix(1405594966, 0),
 				},
-				model.Position{
+				{
 					Coordinate: model.Coordinate{
 						Latitude:  37.967627,
 						Longitude: 30.729563,
