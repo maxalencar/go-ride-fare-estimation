@@ -114,7 +114,7 @@ func (p processor) CalculateFare(in <-chan *model.Ride) <-chan *model.Ride {
 func (p processor) WriteResult(in <-chan *model.Ride, filePath string) {
 	file, err := os.Create(filePath)
 	if err != nil {
-		fmt.Println("cannot create file", err)
+		log.Println("cannot create file", err)
 	}
 	defer file.Close()
 
@@ -124,7 +124,7 @@ func (p processor) WriteResult(in <-chan *model.Ride, filePath string) {
 	for ride := range in {
 		err := writer.Write([]string{strconv.Itoa(ride.ID), strconv.FormatFloat(ride.FareEstimate, 'f', 10, 64)})
 		if err != nil {
-			fmt.Println("cannot write to file", err)
+			log.Println("cannot write to file", err)
 		}
 	}
 }
