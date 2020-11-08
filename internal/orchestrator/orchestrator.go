@@ -13,7 +13,7 @@ type Orchestrator interface {
 	Run() error
 }
 
-// orchestrator holds the structure of our TCP implementation.
+// orchestrator holds the structure of our orch implementation.
 type orchestrator struct {
 	filePath       string
 	resultFilePath string
