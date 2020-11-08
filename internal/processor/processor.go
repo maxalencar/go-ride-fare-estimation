@@ -19,7 +19,7 @@ type Processor interface {
 	Read(filePath string) <-chan model.Data
 	CreateSegments(in <-chan *model.Ride) <-chan *model.Ride
 	CalculateFare(in <-chan *model.Ride) <-chan *model.Ride
-	WriteResult(in <-chan *model.Ride, filePath string)
+	WriteResult(in <-chan *model.Ride, filePath string) error
 }
 
 // processor holds the structure of our processor implementation.
@@ -117,10 +117,11 @@ func (p processor) CalculateFare(in <-chan *model.Ride) <-chan *model.Ride {
 
 // WriteResult creates a file with the result of the processing
 // containing a list of ride_id and fare_estimate.
-func (p processor) WriteResult(in <-chan *model.Ride, filePath string) {
+func (p processor) WriteResult(in <-chan *model.Ride, filePath string) error {
 	file, err := os.Create(filePath)
 	if err != nil {
 		log.Println("cannot create file", err)
+		return err
 	}
 	defer file.Close()
 
@@ -131,8 +132,11 @@ func (p processor) WriteResult(in <-chan *model.Ride, filePath string) {
 		err := writer.Write([]string{strconv.Itoa(ride.ID), strconv.FormatFloat(ride.FareEstimate, 'f', 10, 64)})
 		if err != nil {
 			log.Println("cannot write to file", err)
+			return err
 		}
 	}
+
+	return err
 }
 
 // transform a record from the csv file into data struct.

@@ -50,7 +50,10 @@ func (o orchestrator) Run() error {
 	s := proc.CreateSegments(r)
 	f := proc.CalculateFare(s)
 
-	proc.WriteResult(f, o.resultFilePath)
+	err := proc.WriteResult(f, o.resultFilePath)
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	log.Printf("It took %s", time.Since(start))
 
