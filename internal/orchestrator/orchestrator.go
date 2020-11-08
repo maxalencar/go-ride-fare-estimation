@@ -2,10 +2,7 @@ package orchestrator
 
 import (
 	"errors"
-	"go-ride-fare-estimation/internal/fare"
-	"go-ride-fare-estimation/internal/model"
 	"go-ride-fare-estimation/internal/processor"
-	"go-ride-fare-estimation/internal/segment"
 	"log"
 	"time"
 )
@@ -20,9 +17,6 @@ type Orchestrator interface {
 type orchestrator struct {
 	filePath       string
 	resultFilePath string
-	csegs          chan *model.Ride
-	cfares         chan *model.Ride
-	rides          map[int]*model.Ride
 }
 
 // NewOrcherstrator creates a new Orchestrator using given file path.
@@ -38,23 +32,7 @@ func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
 	return &orchestrator{
 		filePath:       fp,
 		resultFilePath: rfp,
-		csegs:          make(chan *model.Ride),
-		cfares:         make(chan *model.Ride),
 	}, nil
-}
-
-// broadcaster - it broadcasts messages based on the selected channel
-func (o orchestrator) broadcaster() {
-	for {
-		select {
-		case ride := <-o.csegs:
-			log.Printf("creating segments for ride %d \n", ride.ID)
-			ride.Segments = segment.Create(ride.Positions)
-		case ride := <-o.cfares:
-			log.Printf("calculating fare for ride %d \n", ride.ID)
-			ride.FareEstimate = fare.Calculate(ride.Segments)
-		}
-	}
 }
 
 func (o orchestrator) Run() error {
