@@ -34,7 +34,10 @@ func Create(positions []model.Position) []model.Segment {
 		// it skips invalid entries
 		i += nextPos
 
-		segments = append(segments, s)
+		// in case the last segment is invalid, we don't add it to the list
+		if s.Speed <= speedLimit {
+			segments = append(segments, s)
+		}
 	}
 
 	return segments
