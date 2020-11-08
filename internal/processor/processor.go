@@ -13,8 +13,7 @@ import (
 	"time"
 )
 
-// Processor defines the minimum contract our
-// processor must satisfy.
+// Processor defines the minimum contract our processor must satisfy.
 type Processor interface {
 	Process(in <-chan model.Data) <-chan *model.Ride
 	Read(filePath string) <-chan model.Data
@@ -23,15 +22,16 @@ type Processor interface {
 	WriteResult(in <-chan *model.Ride, filePath string)
 }
 
-// TCPServer holds the structure of our TCP implementation.
+// processor holds the structure of our processor implementation.
 type processor struct {
 }
 
-// NewProcessor creates a new processor.
+// NewProcessor creates a new Processor.
 func NewProcessor() Processor {
 	return &processor{}
 }
 
+// Process the data of a ride and send to a channel when all data of a ride is collected.
 func (p processor) Process(in <-chan model.Data) <-chan *model.Ride {
 	out := make(chan *model.Ride)
 
@@ -56,6 +56,7 @@ func (p processor) Process(in <-chan model.Data) <-chan *model.Ride {
 	return out
 }
 
+// Read a file and convert the records into data struct.
 func (p processor) Read(filePath string) <-chan model.Data {
 	out := make(chan model.Data)
 	go func() {
@@ -87,6 +88,8 @@ func (p processor) Read(filePath string) <-chan model.Data {
 	return out
 }
 
+// CreateSegments creates a list of segments based on the ride positions
+// ignoring invalid segments.
 func (p processor) CreateSegments(in <-chan *model.Ride) <-chan *model.Ride {
 	out := make(chan *model.Ride)
 	go func() {
@@ -99,6 +102,7 @@ func (p processor) CreateSegments(in <-chan *model.Ride) <-chan *model.Ride {
 	return out
 }
 
+// CalculateFare calculates a fare based on the ride segments.
 func (p processor) CalculateFare(in <-chan *model.Ride) <-chan *model.Ride {
 	out := make(chan *model.Ride)
 	go func() {
@@ -111,6 +115,8 @@ func (p processor) CalculateFare(in <-chan *model.Ride) <-chan *model.Ride {
 	return out
 }
 
+// WriteResult creates a file with the result of the processing
+// containing a list of ride_id and fare_estimate.
 func (p processor) WriteResult(in <-chan *model.Ride, filePath string) {
 	file, err := os.Create(filePath)
 	if err != nil {
@@ -129,7 +135,7 @@ func (p processor) WriteResult(in <-chan *model.Ride, filePath string) {
 	}
 }
 
-// transform a record from the csv file into data struct
+// transform a record from the csv file into data struct.
 func transform(record []string, line int) (model.Data, error) {
 	var data model.Data
 
@@ -166,6 +172,7 @@ func transform(record []string, line int) (model.Data, error) {
 	return data, nil
 }
 
+// parseDataToPosition parses a data into position.
 func parseDataToPosition(data model.Data) model.Position {
 	return model.Position{
 		Coordinate: model.Coordinate{

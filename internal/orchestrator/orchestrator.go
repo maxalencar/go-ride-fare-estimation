@@ -7,13 +7,12 @@ import (
 	"time"
 )
 
-// Orchestrator defines the minimum contract our
-// orchestrator must satisfy.
+// Orchestrator defines the minimum contract our orchestrator must satisfy.
 type Orchestrator interface {
 	Run() error
 }
 
-// orchestrator holds the structure of our orch implementation.
+// orchestrator holds the structure of our orchestrator implementation.
 type orchestrator struct {
 	filePath       string
 	resultFilePath string
@@ -35,6 +34,12 @@ func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
 	}, nil
 }
 
+// Run using concurrency pipeline pattern.
+// 1. Read the file
+// 2. Collect all data of a ride and start processing
+// 3. Create valid segments
+// 4. Calculate the fare estimate
+// 5. Create a result text file
 func (o orchestrator) Run() error {
 	start := time.Now()
 
