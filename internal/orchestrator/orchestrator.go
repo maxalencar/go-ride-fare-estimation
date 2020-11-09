@@ -4,6 +4,7 @@ import (
 	"errors"
 	"go-ride-fare-estimation/internal/processor"
 	"log"
+	"sync"
 	"time"
 )
 
@@ -45,16 +46,15 @@ func NewOrcherstrator(fp, rfp string, processor processor.Processor) (Orchestrat
 func (o orchestrator) Run() error {
 	start := time.Now()
 
-	c := o.processor.Read(o.filePath)
-	r := o.processor.Process(c)
-	s := o.processor.CreateSegments(r)
-	f := o.processor.CalculateFare(s)
+	var wg sync.WaitGroup
 
-	err := o.processor.WriteResult(f, o.resultFilePath)
-	if err != nil {
-		log.Fatalln(err)
-	}
+	c := o.processor.Read(o.filePath, &wg)
+	r := o.processor.Process(c, &wg)
+	s := o.processor.CreateSegments(r, &wg)
+	f := o.processor.CalculateFare(s, &wg)
+	o.processor.WriteResult(f, o.resultFilePath, &wg)
 
+	wg.Wait()
 	log.Printf("It took %s", time.Since(start))
 
 	return nil

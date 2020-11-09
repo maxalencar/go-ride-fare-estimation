@@ -10,16 +10,17 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 	"time"
 )
 
 // Processor defines the minimum contract our processor must satisfy.
 type Processor interface {
-	Process(in <-chan model.Data) <-chan model.Ride
-	Read(filePath string) <-chan model.Data
-	CreateSegments(in <-chan model.Ride) <-chan model.Ride
-	CalculateFare(in <-chan model.Ride) <-chan model.Ride
-	WriteResult(in <-chan model.Ride, filePath string) error
+	CalculateFare(in <-chan model.Ride, wg *sync.WaitGroup) <-chan model.Ride
+	CreateSegments(in <-chan model.Ride, wg *sync.WaitGroup) <-chan model.Ride
+	Process(in <-chan model.Data, wg *sync.WaitGroup) <-chan model.Ride
+	Read(filePath string, wg *sync.WaitGroup) <-chan model.Data
+	WriteResult(in <-chan model.Ride, filePath string, wg *sync.WaitGroup)
 }
 
 // processor holds the structure of our processor implementation.
@@ -31,14 +32,50 @@ func NewProcessor() Processor {
 	return &processor{}
 }
 
-// Process the data of a ride and send to a channel when all data of a ride is collected.
-func (p processor) Process(in <-chan model.Data) <-chan model.Ride {
+// CalculateFare calculates a fare based on the ride segments.
+func (p processor) CalculateFare(in <-chan model.Ride, wg *sync.WaitGroup) <-chan model.Ride {
+	wg.Add(1)
 	out := make(chan model.Ride)
 
+	go func() {
+		for ride := range in {
+			ride.FareEstimate = fare.Calculate(ride.Segments)
+			out <- ride
+		}
+
+		close(out)
+		wg.Done()
+	}()
+
+	return out
+}
+
+// CreateSegments creates a list of segments based on the ride positions
+// ignoring invalid segments.
+func (p processor) CreateSegments(in <-chan model.Ride, wg *sync.WaitGroup) <-chan model.Ride {
+	wg.Add(1)
+	out := make(chan model.Ride)
+
+	go func() {
+		for ride := range in {
+			ride.Segments = segment.Create(ride.Positions)
+			out <- ride
+		}
+
+		close(out)
+		wg.Done()
+	}()
+
+	return out
+}
+
+// Process the data of a ride and send to a channel when all data of a ride is collected.
+func (p processor) Process(in <-chan model.Data, wg *sync.WaitGroup) <-chan model.Ride {
+	wg.Add(1)
+	out := make(chan model.Ride)
 	var r model.Ride
 
 	go func() {
-		defer close(out)
 		for data := range in {
 			if r.ID == 0 {
 				r = model.Ride{ID: data.RideID}
@@ -52,13 +89,19 @@ func (p processor) Process(in <-chan model.Data) <-chan model.Ride {
 		}
 
 		out <- r
+
+		close(out)
+		wg.Done()
 	}()
+
 	return out
 }
 
 // Read a file and convert the records into data struct.
-func (p processor) Read(filePath string) <-chan model.Data {
+func (p processor) Read(filePath string, wg *sync.WaitGroup) <-chan model.Data {
+	wg.Add(1)
 	out := make(chan model.Data)
+
 	go func() {
 		f, _ := os.Open(filePath)
 		r := csv.NewReader(f)
@@ -66,7 +109,6 @@ func (p processor) Read(filePath string) <-chan model.Data {
 
 		line := 0
 		for {
-			defer close(out)
 			line++
 
 			record, err := r.Read()
@@ -84,59 +126,37 @@ func (p processor) Read(filePath string) <-chan model.Data {
 
 			out <- data
 		}
-	}()
-	return out
-}
 
-// CreateSegments creates a list of segments based on the ride positions
-// ignoring invalid segments.
-func (p processor) CreateSegments(in <-chan model.Ride) <-chan model.Ride {
-	out := make(chan model.Ride)
-	go func() {
-		defer close(out)
-		for ride := range in {
-			ride.Segments = segment.Create(ride.Positions)
-			out <- ride
-		}
+		close(out)
+		wg.Done()
 	}()
-	return out
-}
 
-// CalculateFare calculates a fare based on the ride segments.
-func (p processor) CalculateFare(in <-chan model.Ride) <-chan model.Ride {
-	out := make(chan model.Ride)
-	go func() {
-		defer close(out)
-		for ride := range in {
-			ride.FareEstimate = fare.Calculate(ride.Segments)
-			out <- ride
-		}
-	}()
 	return out
 }
 
 // WriteResult creates a file with the result of the processing
 // containing a list of ride_id and fare_estimate.
-func (p processor) WriteResult(in <-chan model.Ride, filePath string) error {
-	file, err := os.Create(filePath)
-	if err != nil {
-		log.Println("cannot create file", err)
-		return err
-	}
-	defer file.Close()
+func (p processor) WriteResult(in <-chan model.Ride, filePath string, wg *sync.WaitGroup) {
+	wg.Add(1)
 
-	writer := csv.NewWriter(file)
-	defer writer.Flush()
-
-	for ride := range in {
-		err := writer.Write([]string{strconv.Itoa(ride.ID), strconv.FormatFloat(ride.FareEstimate, 'f', 10, 64)})
+	go func() {
+		defer wg.Done()
+		file, err := os.Create(filePath)
 		if err != nil {
-			log.Println("cannot write to file", err)
-			return err
+			log.Fatalf("cannot create file", err)
 		}
-	}
+		defer file.Close()
 
-	return err
+		writer := csv.NewWriter(file)
+		defer writer.Flush()
+
+		for ride := range in {
+			err := writer.Write([]string{strconv.Itoa(ride.ID), strconv.FormatFloat(ride.FareEstimate, 'f', 10, 64)})
+			if err != nil {
+				log.Fatalf("cannot write to file", err)
+			}
+		}
+	}()
 }
 
 // transform a record from the csv file into data struct.
