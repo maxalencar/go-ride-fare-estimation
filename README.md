@@ -24,7 +24,7 @@ Internal application logic
 
 ### `/test`
 
-Additional external tests and test data.
+Additional e2e test, benchmark and test data.
 
 ### `/output`
 
