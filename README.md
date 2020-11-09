@@ -1,6 +1,7 @@
 # GO Ride
 
-A fare estimation that will use as input a list of tuples of the form (id_ride, lat, lng, timestamp) representing the position of the taxi-cab during a ride.
+A fare estimation that will use as input a list of tuples of the form (id_ride, lat, lng, timestamp) representing the position of the taxi-cab during a ride, filter the invalid entries and export a text file following the format: (id_ride fare_estimate)
+
 
 ## Getting Set Up
 
