@@ -9,8 +9,8 @@ import (
 func main() {
 	var fp, rfp string
 
-	flag.StringVar(&fp, "fp", "cmd/go-ride-fare-estimation/testdata/paths.csv", "file path of the rides positions.")
-	flag.StringVar(&rfp, "rfp", "cmd/go-ride-fare-estimation/testdata/result.csv", "file path of the fare estimation results.")
+	flag.StringVar(&fp, "fp", "test/testdata/paths.csv", "file path of the rides positions.")
+	flag.StringVar(&rfp, "rfp", "output/result.csv", "file path of the fare estimation results.")
 	flag.Parse()
 
 	oc, err := orchestrator.NewOrcherstrator(fp, rfp)

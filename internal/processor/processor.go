@@ -15,11 +15,11 @@ import (
 
 // Processor defines the minimum contract our processor must satisfy.
 type Processor interface {
-	Process(in <-chan model.Data) <-chan *model.Ride
+	Process(in <-chan model.Data) <-chan model.Ride
 	Read(filePath string) <-chan model.Data
-	CreateSegments(in <-chan *model.Ride) <-chan *model.Ride
-	CalculateFare(in <-chan *model.Ride) <-chan *model.Ride
-	WriteResult(in <-chan *model.Ride, filePath string) error
+	CreateSegments(in <-chan model.Ride) <-chan model.Ride
+	CalculateFare(in <-chan model.Ride) <-chan model.Ride
+	WriteResult(in <-chan model.Ride, filePath string) error
 }
 
 // processor holds the structure of our processor implementation.
@@ -32,20 +32,20 @@ func NewProcessor() Processor {
 }
 
 // Process the data of a ride and send to a channel when all data of a ride is collected.
-func (p processor) Process(in <-chan model.Data) <-chan *model.Ride {
-	out := make(chan *model.Ride)
+func (p processor) Process(in <-chan model.Data) <-chan model.Ride {
+	out := make(chan model.Ride)
 
-	var r *model.Ride
+	var r model.Ride
 
 	go func() {
 		defer close(out)
 		for data := range in {
-			if r == nil {
-				r = &model.Ride{ID: data.RideID}
+			if r.ID == 0 {
+				r = model.Ride{ID: data.RideID}
 			} else if r.ID != data.RideID {
 				out <- r
 
-				r = &model.Ride{ID: data.RideID}
+				r = model.Ride{ID: data.RideID}
 			}
 
 			r.Positions = append(r.Positions, parseDataToPosition(data))
@@ -90,8 +90,8 @@ func (p processor) Read(filePath string) <-chan model.Data {
 
 // CreateSegments creates a list of segments based on the ride positions
 // ignoring invalid segments.
-func (p processor) CreateSegments(in <-chan *model.Ride) <-chan *model.Ride {
-	out := make(chan *model.Ride)
+func (p processor) CreateSegments(in <-chan model.Ride) <-chan model.Ride {
+	out := make(chan model.Ride)
 	go func() {
 		defer close(out)
 		for ride := range in {
@@ -103,8 +103,8 @@ func (p processor) CreateSegments(in <-chan *model.Ride) <-chan *model.Ride {
 }
 
 // CalculateFare calculates a fare based on the ride segments.
-func (p processor) CalculateFare(in <-chan *model.Ride) <-chan *model.Ride {
-	out := make(chan *model.Ride)
+func (p processor) CalculateFare(in <-chan model.Ride) <-chan model.Ride {
+	out := make(chan model.Ride)
 	go func() {
 		defer close(out)
 		for ride := range in {
@@ -117,7 +117,7 @@ func (p processor) CalculateFare(in <-chan *model.Ride) <-chan *model.Ride {
 
 // WriteResult creates a file with the result of the processing
 // containing a list of ride_id and fare_estimate.
-func (p processor) WriteResult(in <-chan *model.Ride, filePath string) error {
+func (p processor) WriteResult(in <-chan model.Ride, filePath string) error {
 	file, err := os.Create(filePath)
 	if err != nil {
 		log.Println("cannot create file", err)
