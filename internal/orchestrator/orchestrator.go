@@ -18,10 +18,28 @@ type orchestrator struct {
 	filePath       string
 	resultFilePath string
 	processor      processor.Processor
+	wg             sync.WaitGroup
 }
 
-// NewOrcherstrator creates a new Orchestrator using given file path.
-func NewOrcherstrator(fp, rfp string, processor processor.Processor) (Orchestrator, error) {
+// NewOrcherstrator creates a new Orchestrator using given file paths.
+func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
+	if fp == "" {
+		return nil, errors.New("a file path must be provided")
+	}
+
+	if rfp == "" {
+		return nil, errors.New("a result file path must be provided")
+	}
+
+	return &orchestrator{
+		filePath:       fp,
+		resultFilePath: rfp,
+		processor:      processor.NewProcessor(),
+	}, nil
+}
+
+// NewOrcherstratorTest creates a new Orchestrator using given file paths, a processor and a wg. used for testing.
+func NewOrcherstratorTest(fp, rfp string, processor processor.Processor, wg sync.WaitGroup) (Orchestrator, error) {
 	if fp == "" {
 		return nil, errors.New("a file path must be provided")
 	}
@@ -34,6 +52,7 @@ func NewOrcherstrator(fp, rfp string, processor processor.Processor) (Orchestrat
 		filePath:       fp,
 		resultFilePath: rfp,
 		processor:      processor,
+		wg:             wg,
 	}, nil
 }
 
@@ -46,15 +65,13 @@ func NewOrcherstrator(fp, rfp string, processor processor.Processor) (Orchestrat
 func (o orchestrator) Run() error {
 	start := time.Now()
 
-	var wg sync.WaitGroup
+	c := o.processor.Read(o.filePath, &o.wg)
+	r := o.processor.Process(c, &o.wg)
+	s := o.processor.CreateSegments(r, &o.wg)
+	f := o.processor.CalculateFare(s, &o.wg)
+	o.processor.WriteResult(f, o.resultFilePath, &o.wg)
 
-	c := o.processor.Read(o.filePath, &wg)
-	r := o.processor.Process(c, &wg)
-	s := o.processor.CreateSegments(r, &wg)
-	f := o.processor.CalculateFare(s, &wg)
-	o.processor.WriteResult(f, o.resultFilePath, &wg)
-
-	wg.Wait()
+	o.wg.Wait()
 	log.Printf("It took %s", time.Since(start))
 
 	return nil

@@ -5,10 +5,26 @@ import (
 	"go-ride-fare-estimation/internal/orchestrator"
 	"go-ride-fare-estimation/internal/processor"
 	"os"
+	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
+
+func BenchmarkRun(b *testing.B) {
+	orchestrator, err := orchestrator.NewOrcherstratorTest("../testdata/paths.csv", "tmpfile.csv", processor.NewProcessor(), sync.WaitGroup{})
+	if err != nil {
+		b.Fail()
+	}
+
+	for i := 0; i < b.N; i++ {
+		orchestrator.Run()
+	}
+
+	if err := os.Remove("tmpfile.csv"); err != nil {
+		b.Fail()
+	}
+}
 
 type TestSuite struct {
 	suite.Suite
@@ -23,7 +39,7 @@ func (suite *TestSuite) SetupTest() {
 
 	suite.fp = "../testdata/paths.csv"
 	suite.rfp = "tmpfile.csv"
-	suite.orchestrator, err = orchestrator.NewOrcherstrator(suite.fp, suite.rfp, processor.NewProcessor())
+	suite.orchestrator, err = orchestrator.NewOrcherstratorTest(suite.fp, suite.rfp, processor.NewProcessor(), sync.WaitGroup{})
 	if err != nil {
 		suite.Fail(err.Error())
 	}
