@@ -22,14 +22,6 @@ Main applications for this project.
 
 Internal application logic
 
-### `/deployment`
-
-Deployment configurations and templates such as docker-compose
-
-### `/scripts`
-
-Scripts used for several purposes such as building/running application, etc
-
 ### `/test`
 
 Additional external tests and test data.
