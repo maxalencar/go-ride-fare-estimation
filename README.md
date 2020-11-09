@@ -16,7 +16,7 @@ You will need Go.
 
 ### `/cmd`
 
-Main applications for this project.
+Main application for this project.
 
 ### `/internal`
 
