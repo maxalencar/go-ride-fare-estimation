@@ -16,10 +16,11 @@ type Orchestrator interface {
 type orchestrator struct {
 	filePath       string
 	resultFilePath string
+	processor      processor.Processor
 }
 
 // NewOrcherstrator creates a new Orchestrator using given file path.
-func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
+func NewOrcherstrator(fp, rfp string, processor processor.Processor) (Orchestrator, error) {
 	if fp == "" {
 		return nil, errors.New("a file path must be provided")
 	}
@@ -31,6 +32,7 @@ func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
 	return &orchestrator{
 		filePath:       fp,
 		resultFilePath: rfp,
+		processor:      processor,
 	}, nil
 }
 
@@ -43,14 +45,12 @@ func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
 func (o orchestrator) Run() error {
 	start := time.Now()
 
-	proc := processor.NewProcessor()
+	c := o.processor.Read(o.filePath)
+	r := o.processor.Process(c)
+	s := o.processor.CreateSegments(r)
+	f := o.processor.CalculateFare(s)
 
-	c := proc.Read(o.filePath)
-	r := proc.Process(c)
-	s := proc.CreateSegments(r)
-	f := proc.CalculateFare(s)
-
-	err := proc.WriteResult(f, o.resultFilePath)
+	err := o.processor.WriteResult(f, o.resultFilePath)
 	if err != nil {
 		log.Fatalln(err)
 	}

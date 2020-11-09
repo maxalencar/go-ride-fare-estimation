@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"go-ride-fare-estimation/internal/orchestrator"
+	"go-ride-fare-estimation/internal/processor"
 	"log"
 )
 
@@ -13,7 +14,7 @@ func main() {
 	flag.StringVar(&rfp, "rfp", "output/result.csv", "file path of the fare estimation results.")
 	flag.Parse()
 
-	oc, err := orchestrator.NewOrcherstrator(fp, rfp)
+	oc, err := orchestrator.NewOrcherstrator(fp, rfp, processor.NewProcessor())
 	if err != nil {
 		log.Fatalln(err)
 	}
