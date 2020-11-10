@@ -18,7 +18,6 @@ type orchestrator struct {
 	filePath       string
 	resultFilePath string
 	processor      processor.Processor
-	wg             sync.WaitGroup
 }
 
 // NewOrcherstrator creates a new Orchestrator using given file paths.
@@ -38,21 +37,12 @@ func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
 	}, nil
 }
 
-// NewOrcherstratorTest creates a new Orchestrator using given file paths, a processor and a wg. used for testing.
-func NewOrcherstratorTest(fp, rfp string, processor processor.Processor, wg sync.WaitGroup) (Orchestrator, error) {
-	if fp == "" {
-		return nil, errors.New("a file path must be provided")
-	}
-
-	if rfp == "" {
-		return nil, errors.New("a result file path must be provided")
-	}
-
+// newOrcherstratorTest creates a new Orchestrator used for unit testing purposes using given file paths and a processor instance enabling mocking capability.
+func newOrcherstratorTest(fp, rfp string, processor processor.Processor) (Orchestrator, error) {
 	return &orchestrator{
 		filePath:       fp,
 		resultFilePath: rfp,
 		processor:      processor,
-		wg:             wg,
 	}, nil
 }
 
@@ -63,15 +53,17 @@ func NewOrcherstratorTest(fp, rfp string, processor processor.Processor, wg sync
 // 4. Calculate the fare estimate
 // 5. Create a result text file
 func (o orchestrator) Run() error {
+	var wg sync.WaitGroup
+
 	start := time.Now()
 
-	c := o.processor.Read(o.filePath, &o.wg)
-	r := o.processor.Process(c, &o.wg)
-	s := o.processor.CreateSegments(r, &o.wg)
-	f := o.processor.CalculateFare(s, &o.wg)
-	o.processor.WriteResult(f, o.resultFilePath, &o.wg)
+	dChan := o.processor.Read(o.filePath, &wg)
+	rpChan := o.processor.Process(dChan, &wg)
+	rsChan := o.processor.CreateSegments(rpChan, &wg)
+	rfChan := o.processor.CalculateFare(rsChan, &wg)
+	o.processor.WriteResult(rfChan, o.resultFilePath, &wg)
 
-	o.wg.Wait()
+	wg.Wait()
 	log.Printf("It took %s", time.Since(start))
 
 	return nil

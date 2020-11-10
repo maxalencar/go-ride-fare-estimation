@@ -3,16 +3,14 @@ package e2e
 import (
 	"encoding/csv"
 	"go-ride-fare-estimation/internal/orchestrator"
-	"go-ride-fare-estimation/internal/processor"
 	"os"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
 
 func BenchmarkRun(b *testing.B) {
-	orchestrator, err := orchestrator.NewOrcherstratorTest("../testdata/paths.csv", "tmpfile.csv", processor.NewProcessor(), sync.WaitGroup{})
+	orchestrator, err := orchestrator.NewOrcherstrator("../testdata/paths.csv", "tmpfile.csv")
 	if err != nil {
 		b.Fail()
 	}
@@ -39,7 +37,7 @@ func (suite *TestSuite) SetupTest() {
 
 	suite.fp = "../testdata/paths.csv"
 	suite.rfp = "tmpfile.csv"
-	suite.orchestrator, err = orchestrator.NewOrcherstratorTest(suite.fp, suite.rfp, processor.NewProcessor(), sync.WaitGroup{})
+	suite.orchestrator, err = orchestrator.NewOrcherstrator(suite.fp, suite.rfp)
 	if err != nil {
 		suite.Fail(err.Error())
 	}

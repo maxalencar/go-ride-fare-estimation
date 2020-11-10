@@ -13,9 +13,9 @@ type TestSuite struct {
 }
 
 type testCase struct {
-	name     string
-	objs     []model.Position
-	expected interface{}
+	name  string
+	objs  []model.Position
+	count int
 }
 
 func (suite *TestSuite) TestCreate() {
@@ -38,7 +38,7 @@ func (suite *TestSuite) TestCreate() {
 					Timestamp: time.Unix(1405594966, 0),
 				},
 			},
-			expected: 1,
+			count: 1,
 		},
 		{
 			name: "CreateTwoValidSegmentsWithOneInvalidPosition",
@@ -72,7 +72,7 @@ func (suite *TestSuite) TestCreate() {
 					Timestamp: time.Unix(1405594986, 0),
 				},
 			},
-			expected: 2,
+			count: 2,
 		},
 		{
 			name: "CreateOneValidSegmentWithLastInvalidPosition",
@@ -99,7 +99,7 @@ func (suite *TestSuite) TestCreate() {
 					Timestamp: time.Unix(1405594976, 0),
 				},
 			},
-			expected: 1,
+			count: 1,
 		},
 	}
 
@@ -109,7 +109,7 @@ func (suite *TestSuite) TestCreate() {
 		suite.Run(tc.name, func() {
 			segments := Create(tc.objs)
 
-			suite.Equal(tc.expected, len(segments))
+			suite.Equal(tc.count, len(segments))
 
 			// We should get a different *testing.T for subTests, so that
 			// go test recognises them as proper subtests for output formatting

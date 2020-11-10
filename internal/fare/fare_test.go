@@ -13,9 +13,9 @@ type TestSuite struct {
 }
 
 type testCase struct {
-	name     string
-	objs     []model.Segment
-	expected interface{}
+	name string
+	objs []model.Segment
+	fare float64
 }
 
 func (suite *TestSuite) TestCalculate() {
@@ -43,7 +43,7 @@ func (suite *TestSuite) TestCalculate() {
 					Speed:    2.1550435800609105,
 				},
 			},
-			expected: 3.47,
+			fare: 3.47,
 		},
 		{
 			name: "CalculateMovingNormalFare",
@@ -69,7 +69,7 @@ func (suite *TestSuite) TestCalculate() {
 					Speed:    50,
 				},
 			},
-			expected: 5.962,
+			fare: 5.962,
 		},
 		{
 			name: "CalculateMovingExtraFare",
@@ -95,7 +95,7 @@ func (suite *TestSuite) TestCalculate() {
 					Speed:    50,
 				},
 			},
-			expected: 9.489999999999998,
+			fare: 9.489999999999998,
 		},
 		{
 			name: "CalculateMovingNormalAndExtraFare",
@@ -121,7 +121,7 @@ func (suite *TestSuite) TestCalculate() {
 					Speed:    50,
 				},
 			},
-			expected: 7.362,
+			fare: 7.362,
 		},
 	}
 
@@ -131,7 +131,7 @@ func (suite *TestSuite) TestCalculate() {
 		suite.Run(tc.name, func() {
 			fare := Calculate(tc.objs)
 
-			suite.Equal(tc.expected, fare)
+			suite.Equal(tc.fare, fare)
 
 			// We should get a different *testing.T for subTests, so that
 			// go test recognises them as proper subtests for output formatting

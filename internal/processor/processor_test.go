@@ -71,10 +71,12 @@ func (suite *TestSuite) TestCreateSegment() {
 	r2Chan := suite.processor.CreateSegments(rChan, &wg)
 
 	rChan <- model.Ride{ID: 1, Positions: []model.Position{
-		model.Position{Coordinate: model.Coordinate{Latitude: 37.966660, Longitude: 23.728308}, Timestamp: time.Unix(1405594957, 0)},
-		model.Position{Coordinate: model.Coordinate{Latitude: 37.966627, Longitude: 23.728263}, Timestamp: time.Unix(1405594966, 0)},
+		{Coordinate: model.Coordinate{Latitude: 37.966660, Longitude: 23.728308}, Timestamp: time.Unix(1405594957, 0)},
+		{Coordinate: model.Coordinate{Latitude: 37.966627, Longitude: 23.728263}, Timestamp: time.Unix(1405594966, 0)},
 	}}
-	rChan <- model.Ride{ID: 2, Positions: []model.Position{model.Position{Coordinate: model.Coordinate{Latitude: 37.966627, Longitude: 23.728263}, Timestamp: time.Unix(1405594966, 0)}}}
+	rChan <- model.Ride{ID: 2, Positions: []model.Position{
+		{Coordinate: model.Coordinate{Latitude: 37.966627, Longitude: 23.728263}, Timestamp: time.Unix(1405594966, 0)},
+	}}
 	close(rChan)
 
 	rides := []model.Ride{}

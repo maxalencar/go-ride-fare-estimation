@@ -14,7 +14,7 @@ type TestSuite struct {
 type testCase struct {
 	name     string
 	objs     []model.Coordinate
-	expected interface{}
+	distance float64
 }
 
 func (suite *TestSuite) TestDistance() {
@@ -31,7 +31,7 @@ func (suite *TestSuite) TestDistance() {
 					Longitude: 23.728263,
 				},
 			},
-			expected: 0.005387608950152276,
+			distance: 0.005387608950152276,
 		},
 	}
 
@@ -41,7 +41,7 @@ func (suite *TestSuite) TestDistance() {
 		suite.Run(tc.name, func() {
 			km, _ := Distance(tc.objs[0], tc.objs[1])
 
-			suite.Equal(tc.expected, km)
+			suite.Equal(tc.distance, km)
 
 			// We should get a different *testing.T for subTests, so that
 			// go test recognises them as proper subtests for output formatting

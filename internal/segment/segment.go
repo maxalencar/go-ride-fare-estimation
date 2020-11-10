@@ -9,7 +9,7 @@ const (
 	speedLimit = 100 // speed limit to be considered a valid entry.
 )
 
-// Create the segments of a ride based on the positions
+// Create a list of valid segments of a ride based on the positions
 // 1. it considers a segment as invalid if the speed is more than 100 km/h
 func Create(positions []model.Position) []model.Segment {
 	var segments = make([]model.Segment, 0)
