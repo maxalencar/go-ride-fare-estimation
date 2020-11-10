@@ -24,7 +24,7 @@ func (suite *TestSuite) SetupTest() {
 func (suite *TestSuite) TestRead() {
 	var wg sync.WaitGroup
 
-	dChan := suite.processor.Read("../../test/testdata/paths-small.csv", &wg)
+	dChan := suite.processor.Read("../../test/testdata/paths.csv", &wg)
 
 	dataList := []model.Data{}
 
@@ -33,7 +33,7 @@ func (suite *TestSuite) TestRead() {
 	}
 
 	wg.Wait()
-	suite.Equal(132, len(dataList))
+	suite.Equal(1826, len(dataList))
 }
 
 func (suite *TestSuite) TestProcess() {

@@ -33,7 +33,7 @@ type TestSuite struct {
 func (suite *TestSuite) SetupTest() {
 	var err error
 
-	suite.filePath = "../../test/testdata/paths-small.csv"
+	suite.filePath = "../../test/testdata/paths.csv"
 	suite.resultFilePath = "tmpfile.csv"
 	suite.orchestrator, err = NewOrcherstrator(suite.filePath, suite.resultFilePath)
 	if err != nil {
