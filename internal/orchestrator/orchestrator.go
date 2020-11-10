@@ -23,11 +23,11 @@ type orchestrator struct {
 // NewOrcherstrator creates a new Orchestrator using given file paths.
 func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
 	if fp == "" {
-		return nil, errors.New("a file path must be provided")
+		return nil, errors.New("file path must be provided")
 	}
 
 	if rfp == "" {
-		return nil, errors.New("a result file path must be provided")
+		return nil, errors.New("result file path must be provided")
 	}
 
 	return &orchestrator{
@@ -64,7 +64,7 @@ func (o orchestrator) Run() error {
 	o.processor.WriteResult(rfChan, o.resultFilePath, &wg)
 
 	wg.Wait()
-	log.Printf("It took %s", time.Since(start))
+	log.Printf("It took %s to finish", time.Since(start))
 
 	return nil
 }

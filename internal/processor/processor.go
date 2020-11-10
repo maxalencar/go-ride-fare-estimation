@@ -143,7 +143,7 @@ func (p processor) WriteResult(in <-chan model.Ride, filePath string, wg *sync.W
 		defer wg.Done()
 		file, err := os.Create(filePath)
 		if err != nil {
-			log.Fatalf("cannot create file; err: %v", err)
+			log.Fatalf("could not create file; err: %v", err)
 		}
 		defer file.Close()
 
@@ -153,7 +153,7 @@ func (p processor) WriteResult(in <-chan model.Ride, filePath string, wg *sync.W
 		for ride := range in {
 			err := writer.Write([]string{strconv.Itoa(ride.ID), strconv.FormatFloat(ride.FareEstimate, 'f', 10, 64)})
 			if err != nil {
-				log.Fatalf("cannot write to file; err: %v", err)
+				log.Fatalf("could not write to file; err: %v", err)
 			}
 		}
 	}()
