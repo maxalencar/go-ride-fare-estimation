@@ -2,60 +2,46 @@ package e2e
 
 import (
 	"encoding/csv"
-	"go-ride-fare-estimation/internal/orchestrator"
 	"os"
+	"os/exec"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
 )
 
-func BenchmarkRun(b *testing.B) {
-	orchestrator, err := orchestrator.NewOrcherstrator("../testdata/paths.csv", "tmpfile.csv")
-	if err != nil {
-		b.Fail()
-	}
-
-	for i := 0; i < b.N; i++ {
-		orchestrator.Run()
-	}
-
-	if err := os.Remove("tmpfile.csv"); err != nil {
-		b.Fail()
-	}
-}
-
 type TestSuite struct {
 	suite.Suite
-	orchestrator orchestrator.Orchestrator
-	fp           string
-	rfp          string
+	appPath        string
+	filePath       string
+	resultFilePath string
 }
 
 // It runs before each test
 func (suite *TestSuite) SetupTest() {
-	var err error
-
-	suite.fp = "../testdata/paths.csv"
-	suite.rfp = "tmpfile.csv"
-	suite.orchestrator, err = orchestrator.NewOrcherstrator(suite.fp, suite.rfp)
-	if err != nil {
-		suite.Fail(err.Error())
-	}
+	suite.appPath = "../../cmd/go-ride-fare-estimation/main.go"
+	suite.filePath = "../testdata/paths.csv"
+	suite.resultFilePath = "tmpfile.csv"
 }
 
-func (suite *TestSuite) TestRun() {
-	suite.orchestrator.Run()
-	suite.FileExists(suite.rfp)
+func (suite *TestSuite) TestMain() {
+	cmd := exec.Command("go", "run", suite.appPath, "-fp", suite.filePath, "-rfp", suite.resultFilePath)
 
-	f, err := os.Open(suite.rfp)
+	if err := cmd.Run(); err != nil {
+		os.Remove(suite.resultFilePath)
+		suite.Fail(err.Error())
+	}
+
+	suite.FileExists(suite.resultFilePath)
+
+	f, err := os.Open(suite.resultFilePath)
 	if err != nil {
-		os.Remove(suite.rfp)
+		os.Remove(suite.resultFilePath)
 		suite.Fail(err.Error())
 	}
 
 	l, err := csv.NewReader(f).ReadAll()
 	if err != nil {
-		os.Remove(suite.rfp)
+		os.Remove(suite.resultFilePath)
 		suite.Fail(err.Error())
 	}
 	f.Close()
@@ -80,7 +66,7 @@ func (suite *TestSuite) TestRun() {
 	suite.Equal("9", l[8][0])
 	suite.Equal("6.3471241656", l[8][1])
 
-	if err := os.Remove(suite.rfp); err != nil {
+	if err := os.Remove(suite.resultFilePath); err != nil {
 		suite.Fail(err.Error())
 	}
 }
