@@ -1,10 +1,11 @@
 package harvesine
 
 import (
-	"go-ride-fare-estimation/internal/model"
 	"testing"
 
 	"github.com/stretchr/testify/suite"
+
+	"go-ride-fare-estimation/internal/model"
 )
 
 type TestSuite struct {

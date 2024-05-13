@@ -32,13 +32,13 @@ Default folder where the result file will be created.
 
 ## Running
 
-    go run .\cmd\go-ride-fare-estimation\main.go -fp {FILE_PATH} -rfp {RESULT_FILE_PATH}
+    go run .\cmd\ride\main.go -fp {FILE_PATH} -rfp {RESULT_FILE_PATH}
 
 or
 
-    go build -o go-ride-fare-estimation -i ./cmd/go-ride-fare-estimation/main.go
+    go build -o app -i ./cmd/ride/main.go
 
-    ./go-ride-fare-estimation -fp {FILE_PATH} -rfp {RESULT_FILE_PATH}
+    ./app -fp {FILE_PATH} -rfp {RESULT_FILE_PATH}
 
 
 Usage of go-ride-fare-estimation:

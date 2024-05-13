@@ -1,10 +1,11 @@
 package processor
 
 import (
-	"go-ride-fare-estimation/internal/model"
 	"sync"
 
 	"github.com/stretchr/testify/mock"
+
+	"go-ride-fare-estimation/internal/model"
 )
 
 // Mock - mock

@@ -3,15 +3,16 @@ package processor
 import (
 	"encoding/csv"
 	"fmt"
-	"go-ride-fare-estimation/internal/fare"
-	"go-ride-fare-estimation/internal/model"
-	"go-ride-fare-estimation/internal/segment"
 	"io"
 	"log"
 	"os"
 	"strconv"
 	"sync"
 	"time"
+
+	"go-ride-fare-estimation/internal/fare"
+	"go-ride-fare-estimation/internal/model"
+	"go-ride-fare-estimation/internal/segment"
 )
 
 // Processor defines the minimum contract our processor must satisfy.
