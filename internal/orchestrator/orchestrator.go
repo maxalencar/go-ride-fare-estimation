@@ -2,10 +2,11 @@ package orchestrator
 
 import (
 	"errors"
-	"go-ride-fare-estimation/internal/processor"
 	"log"
 	"sync"
 	"time"
+
+	"go-ride-fare-estimation/internal/processor"
 )
 
 // Orchestrator defines the minimum contract our orchestrator must satisfy.

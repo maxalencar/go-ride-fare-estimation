@@ -1,8 +1,9 @@
 package fare
 
 import (
-	"go-ride-fare-estimation/internal/model"
 	"time"
+
+	"go-ride-fare-estimation/internal/model"
 )
 
 const (

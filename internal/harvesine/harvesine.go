@@ -1,8 +1,9 @@
 package harvesine
 
 import (
-	"go-ride-fare-estimation/internal/model"
 	"math"
+
+	"go-ride-fare-estimation/internal/model"
 )
 
 const (

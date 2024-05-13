@@ -2,8 +2,9 @@ package main
 
 import (
 	"flag"
-	"go-ride-fare-estimation/internal/orchestrator"
 	"log"
+
+	"go-ride-fare-estimation/internal/orchestrator"
 )
 
 func main() {

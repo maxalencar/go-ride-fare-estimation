@@ -1,11 +1,12 @@
 package fare
 
 import (
-	"go-ride-fare-estimation/internal/model"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/suite"
+
+	"go-ride-fare-estimation/internal/model"
 )
 
 type TestSuite struct {

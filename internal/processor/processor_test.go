@@ -3,13 +3,14 @@ package processor
 import (
 	"encoding/csv"
 	"fmt"
-	"go-ride-fare-estimation/internal/model"
 	"os"
 	"sync"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/suite"
+
+	"go-ride-fare-estimation/internal/model"
 )
 
 type TestSuite struct {
