@@ -19,6 +19,7 @@ type orchestrator struct {
 	filePath       string
 	resultFilePath string
 	processor      processor.Processor
+	wg             sync.WaitGroup
 }
 
 // NewOrcherstrator creates a new Orchestrator using given file paths.
@@ -38,33 +39,22 @@ func NewOrcherstrator(fp, rfp string) (Orchestrator, error) {
 	}, nil
 }
 
-// newOrcherstratorTest creates a new Orchestrator used for unit testing purposes using given file paths and a processor instance enabling mocking capability.
-func newOrcherstratorTest(fp, rfp string, processor processor.Processor) (Orchestrator, error) {
-	return &orchestrator{
-		filePath:       fp,
-		resultFilePath: rfp,
-		processor:      processor,
-	}, nil
-}
-
 // Run using concurrency pipeline pattern.
 // 1. Read the file
 // 2. Collect all data of a ride and start processing
 // 3. Create valid segments
 // 4. Calculate the fare estimate
 // 5. Create a result text file
-func (o orchestrator) Run() error {
-	var wg sync.WaitGroup
-
+func (o *orchestrator) Run() error {
 	start := time.Now()
 
-	dChan := o.processor.Read(o.filePath, &wg)
-	rpChan := o.processor.Process(dChan, &wg)
-	rsChan := o.processor.CreateSegments(rpChan, &wg)
-	rfChan := o.processor.CalculateFare(rsChan, &wg)
-	o.processor.WriteResult(rfChan, o.resultFilePath, &wg)
+	dChan := o.processor.Read(o.filePath, &o.wg)
+	rpChan := o.processor.Process(dChan, &o.wg)
+	rsChan := o.processor.CreateSegments(rpChan, &o.wg)
+	rfChan := o.processor.CalculateFare(rsChan, &o.wg)
+	o.processor.WriteResult(rfChan, o.resultFilePath, &o.wg)
 
-	wg.Wait()
+	o.wg.Wait()
 	log.Printf("It took %s to finish", time.Since(start))
 
 	return nil

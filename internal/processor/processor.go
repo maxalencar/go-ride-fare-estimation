@@ -34,7 +34,7 @@ func NewProcessor() Processor {
 }
 
 // CalculateFare calculates a fare based on the ride segments.
-func (p processor) CalculateFare(in <-chan model.Ride, wg *sync.WaitGroup) <-chan model.Ride {
+func (p *processor) CalculateFare(in <-chan model.Ride, wg *sync.WaitGroup) <-chan model.Ride {
 	wg.Add(1)
 	out := make(chan model.Ride)
 
@@ -53,7 +53,7 @@ func (p processor) CalculateFare(in <-chan model.Ride, wg *sync.WaitGroup) <-cha
 
 // CreateSegments creates a list of segments based on the ride positions
 // ignoring invalid segments.
-func (p processor) CreateSegments(in <-chan model.Ride, wg *sync.WaitGroup) <-chan model.Ride {
+func (p *processor) CreateSegments(in <-chan model.Ride, wg *sync.WaitGroup) <-chan model.Ride {
 	wg.Add(1)
 	out := make(chan model.Ride)
 
@@ -71,7 +71,7 @@ func (p processor) CreateSegments(in <-chan model.Ride, wg *sync.WaitGroup) <-ch
 }
 
 // Process the data of a ride and send to a channel when all data of a ride is collected.
-func (p processor) Process(in <-chan model.Data, wg *sync.WaitGroup) <-chan model.Ride {
+func (p *processor) Process(in <-chan model.Data, wg *sync.WaitGroup) <-chan model.Ride {
 	wg.Add(1)
 	out := make(chan model.Ride)
 	var r model.Ride
@@ -99,7 +99,7 @@ func (p processor) Process(in <-chan model.Data, wg *sync.WaitGroup) <-chan mode
 }
 
 // Read a file and convert the records into data struct.
-func (p processor) Read(filePath string, wg *sync.WaitGroup) <-chan model.Data {
+func (p *processor) Read(filePath string, wg *sync.WaitGroup) <-chan model.Data {
 	wg.Add(1)
 	out := make(chan model.Data)
 
@@ -137,7 +137,7 @@ func (p processor) Read(filePath string, wg *sync.WaitGroup) <-chan model.Data {
 
 // WriteResult creates a file with the result of the processing
 // containing a list of ride_id and fare_estimate.
-func (p processor) WriteResult(in <-chan model.Ride, filePath string, wg *sync.WaitGroup) {
+func (p *processor) WriteResult(in <-chan model.Ride, filePath string, wg *sync.WaitGroup) {
 	wg.Add(1)
 
 	go func() {
